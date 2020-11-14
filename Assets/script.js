@@ -16,13 +16,18 @@
 // WHEN I open the weather dashboard
 // THEN I am presented with the last searched city forecast
 
-
 var apiKey = "d1e2d0763204896fd894698f5c6e27ee";
+var today = moment().format('L');
+var day1 = moment().add(1, 'days').calendar(); 
+var day2 = moment().add(2, 'days').calendar(); 
+var day3 = moment().add(3, 'days').calendar(); 
+var day4 = moment().add(4, 'days').calendar(); 
+var day5 = moment().add(5, 'days').calendar(); 
 
 // function for current condition
 function currentCondition(city) {
 
-    var queryURL = "";
+    var queryURL = `api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
 
     $.ajax({
         url: queryURL,
@@ -31,6 +36,7 @@ function currentCondition(city) {
         console.log(response);
         // WHEN I view current weather conditions for that city
         // THEN I am presented with the city name
+
         // the date
         // an icon representation of weather conditions
         // the temperature
@@ -39,11 +45,14 @@ function currentCondition(city) {
         // and the UV index
         // WHEN I view the UV index
         // THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
-    });
 
-    addToHistory();
-    futureCondition();
+        // display everything
+    });
 }
+
+// addToHistory();
+// futureCondition();
+
 
 // function to add current search to searchHistory
 function addtoHistory() {
@@ -53,7 +62,7 @@ function addtoHistory() {
 // function for future condition
 function futureCondition(city) {
 
-    var queryURL = "";
+    var queryURL = "api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + apiKey;
 
     $.ajax({
         url: queryURL,
@@ -66,12 +75,14 @@ function futureCondition(city) {
         // an icon representation of weather conditions
         // the temperature
         // the humidity
+
+        // display everything
     });
 }
 
-// add event listener on submit button
-$("button").on("click", currentCondition);
+$("#searchBtn").on("click", function(event) {
+    event.preventDefault();
 
-
-
-
+    var city = $("#enterCity").val().trim();
+    currentCondition(city);
+});
