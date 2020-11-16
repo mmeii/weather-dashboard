@@ -28,7 +28,7 @@ var today = moment().format('L');
 // function for current condition
 function currentCondition(city) {
 
-    var queryURL = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+    var queryURL = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
 
     $.ajax({
         url: queryURL,
@@ -38,7 +38,7 @@ function currentCondition(city) {
         console.log(cityWeatherResponse);
         $("#cityDetail").empty();
         var iconCode = cityWeatherResponse.weather[0].icon;
-        var iconURL = "http://openweathermap.org/img/w/" + iconCode + ".png";
+        var iconURL = `http://openweathermap.org/img/w/${iconCode}.png`;
         // WHEN I view current weather conditions for that city
         // THEN I am presented with the city name
         // the date
@@ -50,7 +50,7 @@ function currentCondition(city) {
             <h2 id="currentCity">
                 ${cityWeatherResponse.name} ${today} <img src="${iconURL}" alt="current weather icon" />
             </h2>
-            <p>Temperature: ${cityWeatherResponse.main.temp}</p>
+            <p>Temperature: ${cityWeatherResponse.main.temp} °F</p>
             <p>Humidity: ${cityWeatherResponse.main.humidity}</p>
             <p>Wind Speed: ${cityWeatherResponse.wind.speed} MPH</p>
         `);
@@ -58,8 +58,6 @@ function currentCondition(city) {
         $("#cityDetail").append(currentCity);
 
     // UV index
-
-
     var uviQueryURL = `http://api.openweathermap.org/data/2.5/uvi?lat=${cityWeatherResponse.coord.lat}&lon=${cityWeatherResponse.coord.lon}&appid=${apiKey}`;
 
     $.ajax({
@@ -67,36 +65,36 @@ function currentCondition(city) {
         method: "GET"
     }).then(function(uviResponse) {
         console.log(uviResponse.value);
-        // WHEN I view the UV index
-        // THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
+
         const uvIndex = uviResponse.value;
         const uvIndexP = $(`
             <p>UV Index: 
-                <span id="uvIndexColor" class="px-1 py-1 text-light rounded">${uvIndex}</span>
-            </p>`);
-    
-        if (uvIndex >= 0 && uvIndex <= 2) {
-            $("#uvIndexColor").css("background-color", "#3EA72D")
-        } else if (uvIndex >= 3 && uvIndex <= 5) {
-            $("#uvIndexColor").css("background-color", "#FFF300")
-        } else if (uvIndex >= 6 && uvIndex <= 7) {
-            $("#uvIndexColor").css("background-color", "#F18B00")
-        } else if (uvIndex >= 8 && uvIndex <= 10) {
-            $("#uvIndexColor").css("background-color", "#E53210")
-        } else {
-            $("#uvIndexColor").css("background-color", "#B567A4")  
-        };  
-        // 0-2 green#3EA72D, 3-5 yellow#FFF300, 6-7 orange#F18B00, 8-10 red#E53210, 11+violet#B567A4
+                <span id="uvIndexColor" class="px-2 py-2 rounded">${uvIndex}</span>
+            </p>
+            `);
 
         $("#cityDetail").append(uvIndexP);
+
+        // WHEN I view the UV index
+        // THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
+        // 0-2 green#3EA72D, 3-5 yellow#FFF300, 6-7 orange#F18B00, 8-10 red#E53210, 11+violet#B567A4
+        if (uvIndex >= 0 && uvIndex <= 2) {
+            $("#uvIndexColor").css("background-color", "#3EA72D").css("color", "white");
+        } else if (uvIndex >= 3 && uvIndex <= 5) {
+            $("#uvIndexColor").css("background-color", "#FFF300");
+        } else if (uvIndex >= 6 && uvIndex <= 7) {
+            $("#uvIndexColor").css("background-color", "#F18B00");
+        } else if (uvIndex >= 8 && uvIndex <= 10) {
+            $("#uvIndexColor").css("background-color", "#E53210").css("color", "white");
+        } else {
+            $("#uvIndexColor").css("background-color", "#B567A4").css("color", "white"); 
+        };  
 
         });
     });
 }
 
 // addToHistory();
-// futureCondition();
-
 
 // function to add current search to searchHistory
 function addtoHistory() {
@@ -105,28 +103,55 @@ function addtoHistory() {
 
 // function for future condition
 function futureCondition(city) {
-
-    var queryURL = `http://api.openweathermap.org/data/2.5/forecast?q="${city}&units=imperial&appid=${apiKey}`;
+    // THEN I am presented with a 5-day forecast
+    var futureURL = `http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
 
     $.ajax({
-        url: queryURL,
+        url: futureURL,
         method: "GET"
-    }).then(function(uviResponse) {
-        console.log(uviResponse);
+    }).then(function(futureResponse) {
+        console.log(futureResponse);
+        
+        for (let i = 0; i < 5; i++) {
+            var cityInfo = {
+                date: futureResponse.list[i].dt_txt,
+                icon: futureResponse.list[i].weather[0].icon,
+                temp: futureResponse.list[i].main.temp,
+                humidity: futureResponse.list[i].main.humidity
+            };
+            var shortDate = cityInfo.date.substring(0, 10);
+            var iconURL = `<img src="http://openweathermap.org/img/w/${cityInfo.icon}.png" alt="weather icon" />`;
 
-        // THEN I am presented with a 5-day forecast
+            const futureCard = $(`
+                <div class="pl-3">
+                    <div class="card pl-3 pt-3 mb-3 bg-primary text-light" style="width: 12rem;>
+                        <div class="card-body">
+                            <h5>${shortDate}</h5>
+                            <p>${iconURL}</p>
+                            <p>Temp: ${cityInfo.temp} °F</p>
+                            <p>Humidity: ${cityInfo.humidity}</p>
+                        </div>
+                    </div>
+                <div>
+            `)
+
+            $("#fiveDay").append(futureCard);
+        }
+
         // displays the date
         // an icon representation of weather conditions
         // the temperature
         // the humidity
-
-        // display everything
-    });
+    }); 
 }
+    
+// display everything
+
 
 $("#searchBtn").on("click", function(event) {
     event.preventDefault();
 
     var city = $("#enterCity").val().trim();
     currentCondition(city);
+    futureCondition(city);
 });
