@@ -103,15 +103,18 @@ function addtoHistory() {
 
 // function for future condition
 function futureCondition(city) {
+
     // THEN I am presented with a 5-day forecast
-    var futureURL = `http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
+    var futureURL = `http://api.openweathermap.org/data/2.5/forecast/daily?q=${city}&mode=xml&units=imperial&cnt=7&appid=${apiKey}`;
 
     $.ajax({
         url: futureURL,
         method: "GET"
     }).then(function(futureResponse) {
         console.log(futureResponse);
+        $("#fiveDay").empty();
         
+        // need to fix info grabbed, should be for future 5 days
         for (let i = 0; i < 5; i++) {
             var cityInfo = {
                 date: futureResponse.list[i].dt_txt,
@@ -122,6 +125,10 @@ function futureCondition(city) {
             var shortDate = cityInfo.date.substring(0, 10);
             var iconURL = `<img src="http://openweathermap.org/img/w/${cityInfo.icon}.png" alt="weather icon" />`;
 
+            // displays the date
+            // an icon representation of weather conditions
+            // the temperature
+            // the humidity
             const futureCard = $(`
                 <div class="pl-3">
                     <div class="card pl-3 pt-3 mb-3 bg-primary text-light" style="width: 12rem;>
@@ -138,15 +145,9 @@ function futureCondition(city) {
             $("#fiveDay").append(futureCard);
         }
 
-        // displays the date
-        // an icon representation of weather conditions
-        // the temperature
-        // the humidity
+
     }); 
 }
-    
-// display everything
-
 
 $("#searchBtn").on("click", function(event) {
     event.preventDefault();
