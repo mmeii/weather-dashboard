@@ -51,14 +51,16 @@ function currentCondition(city) {
                 ${cityWeatherResponse.name} ${today} <img src="${iconURL}" alt="current weather icon" />
             </h2>
             <p>Temperature: ${cityWeatherResponse.main.temp} °F</p>
-            <p>Humidity: ${cityWeatherResponse.main.humidity}</p>
+            <p>Humidity: ${cityWeatherResponse.main.humidity}\%</p>
             <p>Wind Speed: ${cityWeatherResponse.wind.speed} MPH</p>
         `);
 
         $("#cityDetail").append(currentCity);
 
     // UV index
-    var uviQueryURL = `http://api.openweathermap.org/data/2.5/uvi?lat=${cityWeatherResponse.coord.lat}&lon=${cityWeatherResponse.coord.lon}&appid=${apiKey}`;
+    var lat = cityWeatherResponse.coord.lat;
+    var lon = cityWeatherResponse.coord.lon;
+    var uviQueryURL = `http://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
     $.ajax({
         url: uviQueryURL,
@@ -74,6 +76,8 @@ function currentCondition(city) {
             `);
 
         $("#cityDetail").append(uvIndexP);
+
+        futureCondition(lat, lon);
 
         // WHEN I view the UV index
         // THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
@@ -102,10 +106,10 @@ function addtoHistory() {
 }
 
 // function for future condition
-function futureCondition(city) {
+function futureCondition(lat, lon) {
 
     // THEN I am presented with a 5-day forecast
-    var futureURL = `http://api.openweathermap.org/data/2.5/forecast/daily?q=${city}&mode=xml&units=imperial&cnt=7&appid=${apiKey}`;
+    var futureURL = `http://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=current,minutely,hourly,alerts&appid=${apiKey}`;
 
     $.ajax({
         url: futureURL,
@@ -115,14 +119,15 @@ function futureCondition(city) {
         $("#fiveDay").empty();
         
         // need to fix info grabbed, should be for future 5 days
-        for (let i = 0; i < 5; i++) {
+        for (let i = 1; i < 6; i++) {
             var cityInfo = {
-                date: futureResponse.list[i].dt_txt,
-                icon: futureResponse.list[i].weather[0].icon,
-                temp: futureResponse.list[i].main.temp,
-                humidity: futureResponse.list[i].main.humidity
+                date: futureResponse.daily[i].dt,
+                icon: futureResponse.daily[i].weather[0].icon,
+                temp: futureResponse.daily[i].temp.day,
+                humidity: futureResponse.daily[i].humidity
             };
-            var shortDate = cityInfo.date.substring(0, 10);
+            var currDate = new Date(cityInfo.date * 1000);
+            console.log(currDate);
             var iconURL = `<img src="http://openweathermap.org/img/w/${cityInfo.icon}.png" alt="weather icon" />`;
 
             // displays the date
@@ -133,10 +138,10 @@ function futureCondition(city) {
                 <div class="pl-3">
                     <div class="card pl-3 pt-3 mb-3 bg-primary text-light" style="width: 12rem;>
                         <div class="card-body">
-                            <h5>${shortDate}</h5>
+                            <h5>${currDate}</h5>
                             <p>${iconURL}</p>
                             <p>Temp: ${cityInfo.temp} °F</p>
-                            <p>Humidity: ${cityInfo.humidity}</p>
+                            <p>Humidity: ${cityInfo.humidity}\%</p>
                         </div>
                     </div>
                 <div>
@@ -154,5 +159,4 @@ $("#searchBtn").on("click", function(event) {
 
     var city = $("#enterCity").val().trim();
     currentCondition(city);
-    futureCondition(city);
 });
