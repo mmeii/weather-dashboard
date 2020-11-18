@@ -9,8 +9,9 @@ h1 {
     display: none;
 }
 
-#cityDetail p {
-    color: #4D4F53;
+#cityDetail p,
+li {
+    color: #4D4F53!important;
 }
 
 .card-body p {

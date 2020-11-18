@@ -19,12 +19,6 @@
 var apiKey = "d1e2d0763204896fd894698f5c6e27ee";
 var today = moment().format('L');
 var searchHistoryList = [];
-// var day1 = moment().add(1, 'days').calendar(); 
-// var day2 = moment().add(2, 'days').calendar(); 
-// var day3 = moment().add(3, 'days').calendar(); 
-// var day4 = moment().add(4, 'days').calendar(); 
-// var day5 = moment().add(5, 'days').calendar(); 
-
 
 // function for current condition
 function currentCondition(city) {
@@ -48,7 +42,7 @@ function currentCondition(city) {
         // the temperature
         // the humidity
         // the wind speed
-        const currentCity = $(`
+        var currentCity = $(`
             <h2 id="currentCity">
                 ${cityWeatherResponse.name} ${today} <img src="${iconURL}" alt="${cityWeatherResponse.weather[0].description}" />
             </h2>
@@ -57,14 +51,13 @@ function currentCondition(city) {
             <p>Wind Speed: ${cityWeatherResponse.wind.speed} MPH</p>
         `);
 
-        // add city searched to local storage
-
-        // const searchedCity = $(`
-        //     <li class="list-group-item">${cityWeatherResponse.name}</li>
-        //     `);
+        // put this in a new function, only append if not in searchHistoryList
+        var searchedCity = $(`
+            <li class="list-group-item">${cityWeatherResponse.name}</li>
+            `);
 
         $("#cityDetail").append(currentCity);
-        // $("#searchHistory").append(searchedCity);
+        $("#searchHistory").append(searchedCity);
 
         // UV index
         var lat = cityWeatherResponse.coord.lat;
@@ -78,8 +71,8 @@ function currentCondition(city) {
         }).then(function(uviResponse) {
             console.log(uviResponse.value);
 
-            const uvIndex = uviResponse.value;
-            const uvIndexP = $(`
+            var uvIndex = uviResponse.value;
+            var uvIndexP = $(`
                 <p>UV Index: 
                     <span id="uvIndexColor" class="px-2 py-2 rounded">${uvIndex}</span>
                 </p>
@@ -107,11 +100,10 @@ function currentCondition(city) {
     });
 }
 
-// addToHistory();
-
 // function to add current search to searchHistory
-function addToHistory() {
 
+function retrieveHistory(city) {
+    
 }
 
 // function for future condition
@@ -139,13 +131,13 @@ function futureCondition(lat, lon) {
             console.log(currDate);
             var iconURL = `<img src="http://openweathermap.org/img/w/${cityInfo.icon}.png" alt="${futureResponse.daily[i].weather[0].main}" />`;
 
-            console.log(iconURL);
+            // console.log(iconURL);
 
             // displays the date
             // an icon representation of weather conditions
             // the temperature
             // the humidity
-            const futureCard = $(`
+            var futureCard = $(`
                 <div class="pl-3">
                     <div class="card pl-3 pt-3 mb-3 bg-primary text-light" style="width: 12rem;>
                         <div class="card-body">
@@ -163,12 +155,25 @@ function futureCondition(lat, lon) {
     }); 
 }
 
+// WHEN I open the weather dashboard
+// THEN I am presented with the last searched city forecast
+
 $("#searchBtn").on("click", function(event) {
     event.preventDefault();
 
     var city = $("#enterCity").val().trim();
     currentCondition(city);
-    searchHistoryList.push(city);
-    localStorage.setItem("city", JSON.stringify(searchHistory));
-    // addToHistory();
+    if (!searchHistoryList.includes(city)) {
+        searchHistoryList.push(city);
+    };
+    
+    localStorage.setItem("city", JSON.stringify(searchHistoryList));
+    console.log(searchHistoryList);
+});
+
+$(document).on("click", ".list-group-item", function() {
+    var listCity = $(this).text();
+    console.log(listCity);
+    // searchHistoryList.empty();
+    currentCondition(listCity);
 });
