@@ -1,6 +1,7 @@
 h1 {
-    font-size: 45px;
-    font-weight: 500;
+    font-size: 50px;
+    font-weight: 400;
+    letter-spacing: 3px;
     color: white;
 }
 
@@ -15,6 +16,19 @@ h1 {
 .card-body p {
     color: white;
 }
+
+h1, h2, h3, h4, h5 {
+    font-family: 'Raleway', sans-serif;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Font-Family: 'Julius Sans One', Sans-Serif;
+Font-Size: 45px;
+Font-Family: 'Monda', Sans-Serif;
+Font-Size: 16px; */
 
 
 

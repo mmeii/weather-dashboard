@@ -18,6 +18,7 @@
 
 var apiKey = "d1e2d0763204896fd894698f5c6e27ee";
 var today = moment().format('L');
+var searchHistoryList = [];
 // var day1 = moment().add(1, 'days').calendar(); 
 // var day2 = moment().add(2, 'days').calendar(); 
 // var day3 = moment().add(3, 'days').calendar(); 
@@ -39,6 +40,7 @@ function currentCondition(city) {
         $("#cityDetail").empty();
         var iconCode = cityWeatherResponse.weather[0].icon;
         var iconURL = `http://openweathermap.org/img/w/${iconCode}.png`;
+
         // WHEN I view current weather conditions for that city
         // THEN I am presented with the city name
         // the date
@@ -48,52 +50,59 @@ function currentCondition(city) {
         // the wind speed
         const currentCity = $(`
             <h2 id="currentCity">
-                ${cityWeatherResponse.name} ${today} <img src="${iconURL}" alt="current weather icon" />
+                ${cityWeatherResponse.name} ${today} <img src="${iconURL}" alt="${cityWeatherResponse.weather[0].description}" />
             </h2>
             <p>Temperature: ${cityWeatherResponse.main.temp} °F</p>
             <p>Humidity: ${cityWeatherResponse.main.humidity}\%</p>
             <p>Wind Speed: ${cityWeatherResponse.wind.speed} MPH</p>
         `);
 
+        // add city searched to local storage
+
+        // const searchedCity = $(`
+        //     <li class="list-group-item">${cityWeatherResponse.name}</li>
+        //     `);
+
         $("#cityDetail").append(currentCity);
+        // $("#searchHistory").append(searchedCity);
 
-    // UV index
-    var lat = cityWeatherResponse.coord.lat;
-    var lon = cityWeatherResponse.coord.lon;
-    var uviQueryURL = `http://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+        // UV index
+        var lat = cityWeatherResponse.coord.lat;
+        var lon = cityWeatherResponse.coord.lon;
+        var uviQueryURL = `http://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
-    $.ajax({
-        url: uviQueryURL,
-        method: "GET"
-    }).then(function(uviResponse) {
-        console.log(uviResponse.value);
+        // chain .then(function());
+        $.ajax({
+            url: uviQueryURL,
+            method: "GET"
+        }).then(function(uviResponse) {
+            console.log(uviResponse.value);
 
-        const uvIndex = uviResponse.value;
-        const uvIndexP = $(`
-            <p>UV Index: 
-                <span id="uvIndexColor" class="px-2 py-2 rounded">${uvIndex}</span>
-            </p>
+            const uvIndex = uviResponse.value;
+            const uvIndexP = $(`
+                <p>UV Index: 
+                    <span id="uvIndexColor" class="px-2 py-2 rounded">${uvIndex}</span>
+                </p>
             `);
 
-        $("#cityDetail").append(uvIndexP);
+            $("#cityDetail").append(uvIndexP);
 
-        futureCondition(lat, lon);
+            futureCondition(lat, lon);
 
-        // WHEN I view the UV index
-        // THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
-        // 0-2 green#3EA72D, 3-5 yellow#FFF300, 6-7 orange#F18B00, 8-10 red#E53210, 11+violet#B567A4
-        if (uvIndex >= 0 && uvIndex <= 2) {
-            $("#uvIndexColor").css("background-color", "#3EA72D").css("color", "white");
-        } else if (uvIndex >= 3 && uvIndex <= 5) {
-            $("#uvIndexColor").css("background-color", "#FFF300");
-        } else if (uvIndex >= 6 && uvIndex <= 7) {
-            $("#uvIndexColor").css("background-color", "#F18B00");
-        } else if (uvIndex >= 8 && uvIndex <= 10) {
-            $("#uvIndexColor").css("background-color", "#E53210").css("color", "white");
-        } else {
-            $("#uvIndexColor").css("background-color", "#B567A4").css("color", "white"); 
-        };  
-
+            // WHEN I view the UV index
+            // THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
+            // 0-2 green#3EA72D, 3-5 yellow#FFF300, 6-7 orange#F18B00, 8-10 red#E53210, 11+violet#B567A4
+            if (uvIndex >= 0 && uvIndex <= 2) {
+                $("#uvIndexColor").css("background-color", "#3EA72D").css("color", "white");
+            } else if (uvIndex >= 3 && uvIndex <= 5) {
+                $("#uvIndexColor").css("background-color", "#FFF300");
+            } else if (uvIndex >= 6 && uvIndex <= 7) {
+                $("#uvIndexColor").css("background-color", "#F18B00");
+            } else if (uvIndex >= 8 && uvIndex <= 10) {
+                $("#uvIndexColor").css("background-color", "#E53210").css("color", "white");
+            } else {
+                $("#uvIndexColor").css("background-color", "#B567A4").css("color", "white"); 
+            };  
         });
     });
 }
@@ -101,7 +110,7 @@ function currentCondition(city) {
 // addToHistory();
 
 // function to add current search to searchHistory
-function addtoHistory() {
+function addToHistory() {
 
 }
 
@@ -118,7 +127,6 @@ function futureCondition(lat, lon) {
         console.log(futureResponse);
         $("#fiveDay").empty();
         
-        // need to fix info grabbed, should be for future 5 days
         for (let i = 1; i < 6; i++) {
             var cityInfo = {
                 date: futureResponse.daily[i].dt,
@@ -126,9 +134,12 @@ function futureCondition(lat, lon) {
                 temp: futureResponse.daily[i].temp.day,
                 humidity: futureResponse.daily[i].humidity
             };
-            var currDate = new Date(cityInfo.date * 1000);
+
+            var currDate = moment.unix(cityInfo.date).format("MM/DD/YYYY");
             console.log(currDate);
-            var iconURL = `<img src="http://openweathermap.org/img/w/${cityInfo.icon}.png" alt="weather icon" />`;
+            var iconURL = `<img src="http://openweathermap.org/img/w/${cityInfo.icon}.png" alt="${futureResponse.daily[i].weather[0].main}" />`;
+
+            console.log(iconURL);
 
             // displays the date
             // an icon representation of weather conditions
@@ -145,12 +156,10 @@ function futureCondition(lat, lon) {
                         </div>
                     </div>
                 <div>
-            `)
+            `);
 
             $("#fiveDay").append(futureCard);
         }
-
-
     }); 
 }
 
@@ -159,4 +168,7 @@ $("#searchBtn").on("click", function(event) {
 
     var city = $("#enterCity").val().trim();
     currentCondition(city);
+    searchHistoryList.push(city);
+    localStorage.setItem("city", JSON.stringify(searchHistory));
+    // addToHistory();
 });
