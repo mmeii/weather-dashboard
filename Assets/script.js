@@ -23,7 +23,7 @@ var searchHistoryList = [];
 // function for current condition
 function currentCondition(city) {
 
-    var queryURL = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
+    var queryURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
 
     $.ajax({
         url: queryURL,
@@ -33,7 +33,7 @@ function currentCondition(city) {
         console.log(cityWeatherResponse);
         $("#cityDetail").empty();
         var iconCode = cityWeatherResponse.weather[0].icon;
-        var iconURL = `http://openweathermap.org/img/w/${iconCode}.png`;
+        var iconURL = `https://openweathermap.org/img/w/${iconCode}.png`;
 
         // WHEN I view current weather conditions for that city
         // THEN I am presented with the city name
@@ -62,7 +62,7 @@ function currentCondition(city) {
         // UV index
         var lat = cityWeatherResponse.coord.lat;
         var lon = cityWeatherResponse.coord.lon;
-        var uviQueryURL = `http://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+        var uviQueryURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
         // chain .then(function());
         $.ajax({
@@ -110,7 +110,7 @@ function retrieveHistory(city) {
 function futureCondition(lat, lon) {
 
     // THEN I am presented with a 5-day forecast
-    var futureURL = `http://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=current,minutely,hourly,alerts&appid=${apiKey}`;
+    var futureURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&units=imperial&exclude=current,minutely,hourly,alerts&appid=${apiKey}`;
 
     $.ajax({
         url: futureURL,
@@ -129,7 +129,7 @@ function futureCondition(lat, lon) {
 
             var currDate = moment.unix(cityInfo.date).format("MM/DD/YYYY");
             console.log(currDate);
-            var iconURL = `<img src="http://openweathermap.org/img/w/${cityInfo.icon}.png" alt="${futureResponse.daily[i].weather[0].main}" />`;
+            var iconURL = `<img src="https://openweathermap.org/img/w/${cityInfo.icon}.png" alt="${futureResponse.daily[i].weather[0].main}" />`;
 
             // console.log(iconURL);
 
