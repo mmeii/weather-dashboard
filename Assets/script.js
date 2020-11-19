@@ -29,9 +29,11 @@ function currentCondition(city) {
         url: queryURL,
         method: "GET"
     }).then(function(cityWeatherResponse) {
-        $("#weatherContent").css("display", "block");
         console.log(cityWeatherResponse);
+        
+        $("#weatherContent").css("display", "block");
         $("#cityDetail").empty();
+        
         var iconCode = cityWeatherResponse.weather[0].icon;
         var iconURL = `https://openweathermap.org/img/w/${iconCode}.png`;
 
@@ -58,12 +60,11 @@ function currentCondition(city) {
         var lon = cityWeatherResponse.coord.lon;
         var uviQueryURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
-        // chain .then(function());
         $.ajax({
             url: uviQueryURL,
             method: "GET"
         }).then(function(uviResponse) {
-            console.log(uviResponse.value);
+            console.log(uviResponse);
 
             var uvIndex = uviResponse.value;
             var uvIndexP = $(`
@@ -92,15 +93,6 @@ function currentCondition(city) {
             };  
         });
     });
-}
-
-// function to add current search to searchHistory
-function addToList() {
-
-}
-
-function retrieveHistory(city) {
-    
 }
 
 // function for future condition
@@ -167,21 +159,23 @@ $("#searchBtn").on("click", function(event) {
     console.log(searchHistoryList);
 });
 
+// WHEN I click on a city in the search history
+// THEN I am again presented with current and future conditions for that city
 $(document).on("click", ".list-group-item", function() {
     var listCity = $(this).text();
-    console.log(listCity);
     currentCondition(listCity);
 });
 
 // WHEN I open the weather dashboard
 // THEN I am presented with the last searched city forecast
-
 $(document).ready(function() {
     var searchHistoryArr = JSON.parse(localStorage.getItem("city"));
 
-    if (searchHistoryArr != null) {
-        var lastSearched = searchHistoryArr.length - 1;
-        currentCondition(searchHistoryArr[lastSearched]);
+    if (searchHistoryArr !== null) {
+        var lastSearchedIndex = searchHistoryArr.length - 1;
+        var lastSearchedCity = searchHistoryArr[lastSearchedIndex];
+        currentCondition(lastSearchedCity);
+        console.log(`Last searched city: ${lastSearchedCity}`);
     }
 });
 
