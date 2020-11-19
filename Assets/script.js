@@ -51,13 +51,7 @@ function currentCondition(city) {
             <p>Wind Speed: ${cityWeatherResponse.wind.speed} MPH</p>
         `);
 
-        // put this in a new function, only append if not in searchHistoryList
-        var searchedCity = $(`
-            <li class="list-group-item">${cityWeatherResponse.name}</li>
-            `);
-
         $("#cityDetail").append(currentCity);
-        $("#searchHistory").append(searchedCity);
 
         // UV index
         var lat = cityWeatherResponse.coord.lat;
@@ -101,6 +95,9 @@ function currentCondition(city) {
 }
 
 // function to add current search to searchHistory
+function addToList() {
+
+}
 
 function retrieveHistory(city) {
     
@@ -128,10 +125,7 @@ function futureCondition(lat, lon) {
             };
 
             var currDate = moment.unix(cityInfo.date).format("MM/DD/YYYY");
-            console.log(currDate);
             var iconURL = `<img src="https://openweathermap.org/img/w/${cityInfo.icon}.png" alt="${futureResponse.daily[i].weather[0].main}" />`;
-
-            // console.log(iconURL);
 
             // displays the date
             // an icon representation of weather conditions
@@ -155,9 +149,8 @@ function futureCondition(lat, lon) {
     }); 
 }
 
-// WHEN I open the weather dashboard
-// THEN I am presented with the last searched city forecast
 
+// add on click event listener 
 $("#searchBtn").on("click", function(event) {
     event.preventDefault();
 
@@ -165,6 +158,10 @@ $("#searchBtn").on("click", function(event) {
     currentCondition(city);
     if (!searchHistoryList.includes(city)) {
         searchHistoryList.push(city);
+        var searchedCity = $(`
+            <li class="list-group-item">${city}</li>
+            `);
+        $("#searchHistory").append(searchedCity);
     };
     
     localStorage.setItem("city", JSON.stringify(searchHistoryList));
@@ -177,3 +174,6 @@ $(document).on("click", ".list-group-item", function() {
     // searchHistoryList.empty();
     currentCondition(listCity);
 });
+
+// WHEN I open the weather dashboard
+// THEN I am presented with the last searched city forecast
