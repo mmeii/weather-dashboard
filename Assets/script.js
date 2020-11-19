@@ -149,7 +149,6 @@ function futureCondition(lat, lon) {
     }); 
 }
 
-
 // add on click event listener 
 $("#searchBtn").on("click", function(event) {
     event.preventDefault();
@@ -171,9 +170,19 @@ $("#searchBtn").on("click", function(event) {
 $(document).on("click", ".list-group-item", function() {
     var listCity = $(this).text();
     console.log(listCity);
-    // searchHistoryList.empty();
     currentCondition(listCity);
 });
 
 // WHEN I open the weather dashboard
 // THEN I am presented with the last searched city forecast
+
+$(document).ready(function() {
+    var searchHistoryArr = JSON.parse(localStorage.getItem("city"));
+
+    if (searchHistoryArr != null) {
+        var lastSearched = searchHistoryArr.length - 1;
+        currentCondition(searchHistoryArr[lastSearched]);
+    }
+});
+
+
