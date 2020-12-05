@@ -50,8 +50,8 @@ This is a weather dashboard with form inputs that will run in the browser and fe
 
 ## Websites
 
-* Github: https://github.com/mmeii/6-weather-dashboard
-* Deployed: https://mmeii.github.io/6-weather-dashboard/
+* Github: https://github.com/mmeii/weather-dashboard
+* Deployed: https://mmeii.github.io/weather-dashboard/
 
 ## License
 
